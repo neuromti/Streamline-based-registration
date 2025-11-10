@@ -21,3 +21,6 @@ warpcorrect mrtrix_temp_to_sub_warp[].nii final_temp_to_sub_warp.mif -marker 214
 
 tcktransform data/dbs_tractography.tck final_temp_to_sub_warp.mif output.tck
 
+
+HCP10_MRI/data/959574_StructuralRecommended/959574/T1w/T1w_acpc_dc_restore_brain.nii.gz
+
