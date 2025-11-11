@@ -4,7 +4,7 @@ import ants
 
 TRACTS_10_DIR = './HCP10_Tracts'
 MRI_10_DIR = './HCP10_MRI'
-OUTPUT_DIR = './output'
+OUTPUT_DIR = './output/syn'
 SUBJECTS = list(filter(lambda x: not x.endswith('.txt'), os.listdir(TRACTS_10_DIR)))
 TEMPLATE_SUBJECT = '959574'
 TEMPLATE_PATH = os.path.join(MRI_10_DIR, 'data', f"{TEMPLATE_SUBJECT}_StructuralRecommended", f"{TEMPLATE_SUBJECT}", 'T1w', 'T1w_acpc_dc_restore_brain.nii.gz')
@@ -41,8 +41,8 @@ for subject in SUBJECTS:
     print(f"Warped image saved for subject {subject}")
 
     # Save the inverse transforms and affine matrix
-    temp_inv_warp_path = mytx['invtransforms'][1]
-    temp_affine_path = mytx['invtransforms'][0] 
+    temp_inv_warp_path = mytx['fwdtransforms'][0]
+    temp_affine_path = mytx['fwdtransforms'][1] 
     
     # Define saving paths
     final_inv_warp_path = os.path.join(dest_dir, f'inv_warp_{subject}.nii.gz')

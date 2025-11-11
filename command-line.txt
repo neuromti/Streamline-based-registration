@@ -22,5 +22,16 @@ warpcorrect mrtrix_temp_to_sub_warp[].nii final_temp_to_sub_warp.mif -marker 214
 tcktransform data/dbs_tractography.tck final_temp_to_sub_warp.mif output.tck
 
 
-HCP10_MRI/data/959574_StructuralRecommended/959574/T1w/T1w_acpc_dc_restore_brain.nii.gz
+ref= HCP10_MRI/data/959574_StructuralRecommended/959574/T1w/T1w_acpc_dc_restore_brain.nii.gz
+
+patient = HCP10_MRI/data/965367_StructuralRecommended/965367/T1w/T1w_acpc_dc_restore_brain.nii.gz
+
+
+# Synthmorph
+./synthmorph -o moved.nii -t trans.nii data/3102_BL_PD_1/T1w_acpc_dc_restore_brain.nii.gz data/fixed_T1w_acpc_dc_restore_brain.nii.gz
+
+warpconvert trans.nii displacement2deformation trans_deform.mif
+
+tcktransform data/fixed_CC.tck trans_deform.mif output_CC.tck
+
 

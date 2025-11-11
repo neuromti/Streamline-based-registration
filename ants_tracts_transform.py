@@ -7,8 +7,7 @@ MRI_10_DIR = './HCP10_MRI'
 OUTPUT_DIR = './output'
 TEMPLATE_SUBJECT = '959574'
 
-SUBJECT_IDS = list(filter(lambda x: not x.endswith('.txt') and x != TEMPLATE_SUBJECT, os.listdir(TRACTS_10_DIR)))[1:2]
-print(SUBJECT_IDS)
+SUBJECT_IDS = list(filter(lambda x: not x.endswith('.txt') and x != TEMPLATE_SUBJECT, os.listdir(TRACTS_10_DIR)))
 TEMPLATE_IMAGE = os.path.join(MRI_10_DIR, 'data', f"{TEMPLATE_SUBJECT}_StructuralRecommended", f"{TEMPLATE_SUBJECT}", 'T1w', 'T1w_acpc_dc_restore_brain.nii.gz')
 TRACKS_INPUT = os.path.join(TRACTS_10_DIR, TEMPLATE_SUBJECT, "tracts_tck", "CC.tck")
 IDENTITY_WARP_BASE = "identity_warp"

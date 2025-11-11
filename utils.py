@@ -14,7 +14,7 @@ def tck_to_tdi(tck_path, ref_nii_path):
 
     tdi = density_map(streamlines, reference_affine, reference_shape)
 
-    print(f"Generatde DTI from {tck_path}. Shape: {tdi.shape}. Max Density: {np.max(tdi)}")
+    #print(f"Generatde DTI from {tck_path}. Shape: {tdi.shape}. Max Density: {np.max(tdi)}")
 
     #save_nifti('tdi-output.nii.gz', tdi.astype('int32'), affine=reference_affine)
 
