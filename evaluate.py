@@ -4,15 +4,14 @@ import numpy as np
 from dipy.io.streamline import load_tck
 
 TEMPLATE_SUBJECT = '959574'
-SUBJECTS_ID = 965771
 TRACTS_10_DIR = './HCP10_Tracts'
 SUBJECT_IDS = list(filter(lambda x: not x.endswith('.txt') and x != TEMPLATE_SUBJECT, os.listdir(TRACTS_10_DIR)))
 MRI_10_DIR = './HCP10_MRI'
 OUTPUT_DIR = './output'
-METHODS = ['synthmorph', 'syn']
+METHODS = ['synthmorph', 'syn', 'mrregister']
 #METHODS = ['synthmorph']
-REFERENCE_NIFTI_PATH = os.path.join(MRI_10_DIR, 'data', f"{TEMPLATE_SUBJECT}_StructuralRecommended", f"{TEMPLATE_SUBJECT}", 'T1w', 'T1w_acpc_dc_restore_brain.nii.gz')
-
+REFERENCE_STRUCTURAL_PATH = os.path.join(MRI_10_DIR, 'data', f"{TEMPLATE_SUBJECT}_StructuralRecommended", f"{TEMPLATE_SUBJECT}", 'T1w', 'T1w_acpc_dc_restore_brain.nii.gz')
+REFERENCE_DIFFUSION_PATH = os.path.join(MRI_10_DIR, 'data', f"{TEMPLATE_SUBJECT}_Diffusion3TRecommended", f"{TEMPLATE_SUBJECT}", "T1w", "Diffusion", "data.nii.gz")
 # Define the target number of streamlines for subsampling
 TARGET_STREAMLINE_COUNT = 10000
 # Define the standard number of points for streamline resampling
@@ -22,14 +21,23 @@ for method in METHODS:
     wdsc_results = []
     bmd_results = []
     dest_dir = os.path.join('./output', method)
+    reference_niffti_path = REFERENCE_STRUCTURAL_PATH
+    if method == 'mrregister':
+        reference_niffti_path = REFERENCE_DIFFUSION_PATH
+        
+    csv_filepath = os.path.join(dest_dir, 'results.csv')
+    
+    # Initialize/Overwrite the CSV file with headers
+    with open(csv_filepath, 'w') as f:
+        f.write("SubjectID,wDSC,BMD\n")
     print(f"\n\n########## Evaluating method: {method} ##########\n")
     for subject_id in SUBJECT_IDS:
         tracts_moving_path = os.path.join(TRACTS_10_DIR, f"{subject_id}", "tracts_tck", "CC.tck")
         tracts_warped_path = os.path.join(dest_dir, subject_id ,  f"{subject_id}_CC_warped.tck")
         
         # Convert TCK files to Track Density Images (TDI)
-        tdi_moving = tck_to_tdi(tracts_moving_path, REFERENCE_NIFTI_PATH)
-        tdi_warped = tck_to_tdi(tracts_warped_path, REFERENCE_NIFTI_PATH)
+        tdi_moving = tck_to_tdi(tracts_moving_path, reference_niffti_path)
+        tdi_warped = tck_to_tdi(tracts_warped_path, reference_niffti_path)
         
         # Calculate Weighted Dice Similarity Coefficient (wDSC)
         wdsc_result = weighted_dice_score(tdi_moving, tdi_warped)
@@ -37,9 +45,9 @@ for method in METHODS:
         print(f"Weighted Dice Similarity Coefficient (wDSC) {subject_id}: **{wdsc_result:.4f}**")
         
         # Load streamlines for Bundle Minimum Distance (BMD) calculation
-        loadtck_moving = load_tck(tracts_moving_path, REFERENCE_NIFTI_PATH)
+        loadtck_moving = load_tck(tracts_moving_path, reference_niffti_path)
         tracts_moving = loadtck_moving.streamlines
-        loadtck_warped = load_tck(tracts_warped_path, REFERENCE_NIFTI_PATH)
+        loadtck_warped = load_tck(tracts_warped_path, reference_niffti_path)
         tracts_warped = loadtck_warped.streamlines
         
         # Subsample streamlines to target count
@@ -56,7 +64,7 @@ for method in METHODS:
         
         print(f"Bundle Minimum Distance (BMD) {subject_id}: **{bmd_value:.4f}**")
         # write individual results to csv file
-        with open(os.path.join(dest_dir, 'results.csv'), 'a') as f:
+        with open(csv_filepath, 'a') as f:
             f.write(f"{subject_id},{wdsc_result:.4f},{bmd_value:.4f}\n")    
 
     # Calculate the average wDSC and std across all subjects 
@@ -73,6 +81,6 @@ for method in METHODS:
     print(f"=== Standard Deviation of Bundle Minimum Distance (BMD) across all subjects: **{std_bmd:.4f}** ===")
     
     # write average results to csv file
-    with open(os.path.join(dest_dir, 'results.csv'), 'a') as f:
+    with open(csv_filepath, 'a') as f:
         f.write(f"Average,{average_wdsc:.4f},{average_bmd:.4f}\n")
         f.write(f"Std,{std_wdsc:.4f},{std_bmd:.4f}\n")

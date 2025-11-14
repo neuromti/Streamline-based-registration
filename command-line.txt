@@ -45,4 +45,14 @@ dwi2response dhollander dwi_preproc.mif wm.txt gm.txt csf.txt -mask nodif_brain_
 3. Estimate the FOD
 dwi2fod msmt_csd dwi_preproc.mif wm.txt wmfod.mif gm.txt gm.mif csf.txt csf.mif -mask nodif_brain_mask.nii.gz -lmax 8,0,0
 
+4. Perform FOD registration
+mrregister moving_wmfod.mif fixed_wmfod.mif -type rigid_affine_nonlinear -nl_warp moving_to_template.mif template_to_moving.mif
+
+5. Tracts registration
+tcktransform HCP10_Tracts/959574/tracts_tck/CC.tck moving_to_template.mif output_CC.tck
+
+
+
+
+
 
