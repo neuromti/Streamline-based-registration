@@ -35,3 +35,14 @@ warpconvert trans.nii displacement2deformation trans_deform.mif
 tcktransform data/fixed_CC.tck trans_deform.mif output_CC.tck
 
 
+# FOD estimation
+1. Convert to MRtrix format
+mrconvert data.nii.gz dwi_preproc.mif -fslgrad bvecs bvals 
+
+2. Estimate the Multi-Tissue Response Functions
+dwi2response dhollander dwi_preproc.mif wm.txt gm.txt csf.txt -mask nodif_brain_mask.nii.gz -voxels response_voxels.mif
+
+3. Estimate the FOD
+dwi2fod msmt_csd dwi_preproc.mif wm.txt wmfod.mif gm.txt gm.mif csf.txt csf.mif -mask nodif_brain_mask.nii.gz -lmax 8,0,0
+
+

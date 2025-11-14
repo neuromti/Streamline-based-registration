@@ -38,30 +38,34 @@ def process_subject(subject_id):
     os.makedirs(dest_dir, exist_ok=True)
 
     # Perform registration using SynthMorph
-    run_command([
+    cmd_step_1 = [
     "./synthmorph",
     "register",
     "-o", os.path.join(dest_dir, f"{subject_id}_moved.nii.gz"),
     "-t",  os.path.join(dest_dir, f"{subject_id}_trans.nii.gz"), 
     moving_img,
     fixed_img,  
-    ], subject_id)
+    ]
+    run_command(cmd_step_1, subject_id)
     print(f"SynthMorph registration completed for subject {subject_id}.")
     
     # Convert displacement field to deformation field
-    run_command([
+    cmd_step_2 = [
         "warpconvert", 
         os.path.join(dest_dir, f"{subject_id}_trans.nii.gz"), 
         "displacement2deformation", 
         os.path.join(dest_dir, f"{subject_id}_deformation.nii.gz"),
-        ], subject_id)
+        ]
+    run_command(cmd_step_2, subject_id)
     
     # Apply deformation to the tractography file
-    run_command(["tcktransform",
+    cmd_step_3 = [
+        "tcktransform",
         TRACKS_INPUT,
         os.path.join(dest_dir, f"{subject_id}_deformation.nii.gz"),
         os.path.join(dest_dir, f"{subject_id}_CC_warped.tck"),
-        ], subject_id)
+        ]
+    run_command(cmd_step_3, subject_id)
     print(f"Deformation applied to tractography file for subject {subject_id}.")
     
 if __name__ == "__main__":
